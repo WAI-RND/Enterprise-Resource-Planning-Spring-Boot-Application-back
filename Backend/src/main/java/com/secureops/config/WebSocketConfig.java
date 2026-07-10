@@ -24,7 +24,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOrigins(
                         "http://localhost:5175",  
                         "http://localhost:5174",  
-                        "https://localhost:3000",  
+                        "https://localhost:3000",
+                        "http://localhost:3000",
+                        "http://localhost",
                         "http://localhost:5173",
                         "https://192.168.1.16:3000",
                         "https://192.168.1.*:3000")
