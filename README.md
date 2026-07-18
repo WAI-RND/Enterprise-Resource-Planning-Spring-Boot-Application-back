@@ -1,134 +1,149 @@
 # Enterprise Resource Planning System
 
-A full-stack Enterprise Resource Planning (ERP) system built with **Spring Boot** (backend) and **React** (frontend) to streamline business operations including HR, sales, inventory, finance, and security management.
+A full-stack Enterprise Resource Planning (ERP) system built with **Spring Boot** (backend) and **React** (frontend) to support business operations including HR records, sales document workflows, task/calendar scheduling, real-time collaboration, and security log monitoring.
 
-## 🎯 Overview
+## Overview
 
-This ERP system provides a comprehensive solution for managing enterprise operations with a modern, secure, and scalable architecture. Built for Union Concept, it features real-time collaboration, task management, calendar scheduling, sales tracking, and security monitoring.
+Built for Union Concept, this system combines real-time chat, task and calendar management, an HR employee module, a sales quote-to-invoice pipeline, and a log-based security monitoring layer into a single Spring Boot + React application, deployed locally via Docker Compose.
 
-## ✨ Key Features
+## Project Status
 
-### 👥 Account & User Management
-- User registration and authentication with reCAPTCHA protection
-- Role-based access control (Admin, Employee, Security)
-- Password reset with email verification
+This is a broad, actively-developed prototype rather than a finished production ERP. The chat, calendar/task, HR, and sales modules are functionally substantial. Authorization hardening across modules, automated testing, and database migrations are still in progress — see [Known Limitations](#known-limitations) below before relying on this for real business or production data.
+
+## Key Features
+
+### Account & User Management
+- User registration with administrator approval before an account becomes active
+- JWT-based authentication
+- Role-based access: `USER` and `ADMIN`
+- Password reset via a six-digit emailed verification code
 - Profile management and account settings
-- Admin dashboard for user management
+- Admin dashboard for reviewing pending accounts and managing users
 
-### 📅 Calendar & Scheduling
-- Interactive calendar with event management
-- Create, edit, and delete events
-- Mini calendar view with upcoming events
-- Event notifications and reminders
-- Multi-user scheduling support
+### Calendar & Scheduling
+- Interactive calendar with event creation, editing, and deletion
+- Tasks and events share a unified model, with start/end times and completion status
+- Global (all-user) and user-assigned events
+- Status tracking: pending, in progress, completed, cancelled
 
-### 💬 Real-Time Chat System
-- Instant messaging between users
-- Conversation management and search
-- Message replies and threading
-- Date separators for better organization
-- Filter conversations by status
+### Real-Time Chat System
+- Instant messaging between users with participant-based conversations
+- Text and file messages, message history, typing indicators, and read status
+- Conversation archiving and search
+- Delivered over WebSocket/STOMP
 
-### 📊 Task Management
+### Task Management
 - Create and assign tasks to employees
-- Track task status and progress
-- Task detail view with full information
-- All tasks overview dashboard
-- Deadline management and notifications
+- Track task status, priority, and due dates
+- Task detail view and an all-tasks overview dashboard
 
-### 💼 Employee Management
-- Employee profile creation and editing
-- Task assignment and tracking
-- Employee performance monitoring
-- Department and role management
+### Employee Management (HR)
+- Employee profile creation and editing (contact info, position, salary, hire/birth date, address)
+- HR task assignment and tracking per employee
+- Employee status tracking
 
-### 💰 Sales Module
-- Sales order management
-- Quote generation and tracking
-- Invoice creation and email delivery
-- Product sales reports
-- Sales summary analytics
-- Customer management
+### Sales Module
+- Client and product management
+- Quote creation and lifecycle tracking (draft, sent, accepted, rejected, expired, converted to order)
+- Order lifecycle tracking, with quote-to-order conversion
+- Invoice generation, lifecycle tracking, and email delivery
+- Client-side PDF generation for invoices
+- Sales summary and product-sales reporting
 
-### 🔒 Security Dashboard
-- Security incident monitoring
-- Alert management system
-- Log tracking and analysis
-- Access control monitoring
-- Security metrics and reports
+### Security Log Monitoring (Experimental)
+- Backend log scanner that flags patterns associated with brute-force attempts, path traversal, SQL injection, cross-site scripting, and similar activity
+- Alert listing, summary statistics, and top-attacking-IP views
+- Frontend security dashboard for browsing alerts and reports
 
-## 🛠️ Technology Stack
+This module is an early, pattern-matching log scanner rather than a full security-operations platform — see Known Limitations.
+
+## Technology Stack
 
 ### Frontend
-- **React 18** - UI framework
+- **React 19** - UI framework
+- **Vite** - Build tool and dev server
 - **React Router** - Navigation and routing
 - **Axios** - HTTP client for API calls
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Utility-first CSS framework
-- **WebSocket** - Real-time communication
-- **Google reCAPTCHA v2** - Bot protection
-- **jsPDF** - PDF generation for invoices
-- **FullCalendar** - Calendar interface
+- **Tailwind CSS**, **Material UI**, **Ant Design** - styling and components
+- **React Hook Form** + **Yup** - form handling and validation
+- **TanStack Query** / **TanStack Table** - data fetching and tables
+- **STOMP.js** + **SockJS** - WebSocket real-time communication
+- **Chart.js** / **Recharts** - charts and reporting visuals
+- **jsPDF** + **html2canvas** - client-side PDF generation
+- **Google reCAPTCHA v2** - bot-protection widget (frontend only, see Known Limitations)
 
 ### Backend
-- **Spring Boot** - Java application framework
-- **Spring Security** - Authentication and authorization
-- **Spring Data JPA** - Database access
-- **WebSocket** - Real-time messaging
-- **Maven** - Build and dependency management
-- **PostgreSQL/MySQL** - Database (configurable)
+- **Java 21**
+- **Spring Boot 3.4** - application framework
+- **Spring Security** - authentication and authorization
+- **Spring Data JPA** / **Hibernate** - database access
+- **Spring WebSocket** (STOMP/SockJS) - real-time messaging
+- **Spring Mail** - email delivery
+- **JJWT** - JWT issuing and validation
+- **BCrypt** - password hashing
+- **Maven** - build and dependency management
+- **PostgreSQL 16** - database
 
-### Security & Infrastructure
-- **HTTPS/SSL** - Secure communication
-- **JWT** - Token-based authentication
-- **CORS** - Cross-origin resource sharing
-- **Environment Variables** - Secure configuration
+### Infrastructure
+- **Docker Compose** - local multi-service deployment (PostgreSQL, backend, Nginx-served frontend)
+- **Nginx** - static frontend hosting and API/WebSocket proxying
+- **JWT** - stateless, token-based session handling
+- **CORS** - cross-origin configuration
+- **Environment-based configuration** - `.properties` files per profile (dev, docker, prod)
 
-## 📁 Project Structure
-
-```
-├── frontend/                    # React application
-│   ├── src/
-│   │   ├── Components/         # Reusable UI components
-│   │   │   ├── Account/       # Account management
-│   │   │   ├── Calendar/      # Calendar components
-│   │   │   ├── Chat/          # Chat interface
-│   │   │   ├── Common/        # Shared components
-│   │   │   ├── Employes/      # Employee management
-│   │   │   ├── Sales/         # Sales module
-│   │   │   ├── Security/      # Security features
-│   │   │   └── UI/            # UI elements
-│   │   ├── context/           # React Context providers
-│   │   ├── hooks/             # Custom React hooks
-│   │   ├── pages/             # Page components
-│   │   ├── Router/            # Route configuration
-│   │   ├── services/          # API service layer
-│   │   ├── styles/            # CSS stylesheets
-│   │   └── utils/             # Utility functions
-│   ├── public/                # Static assets
-│   └── cert/                  # SSL certificates (local dev)
-│
-└── backend/                    # Spring Boot application
-    └── src/main/java/         # Java source code
-        ├── controllers/       # REST API endpoints
-        ├── models/           # Data models
-        ├── repositories/     # Data access layer
-        ├── services/         # Business logic
-        ├── security/         # Security configuration
-        └── config/           # Application configuration
+## Project Structure
 
 ```
+Enterprise-Resource-Planning-Spring-Boot-Application/
+├── Backend/
+│   ├── pom.xml
+│   ├── Dockerfile
+│   └── src/main/
+│       ├── java/com/secureops/
+│       │   ├── config/
+│       │   ├── controller/
+│       │   ├── dto/
+│       │   ├── entity/
+│       │   ├── exception/
+│       │   ├── repository/
+│       │   ├── service/
+│       │   ├── util/
+│       │   ├── hr/          # Employee & HR-task module
+│       │   └── sales/       # Clients, products, quotes, orders, invoices
+│       └── resources/
+│           ├── application.properties
+│           ├── application-dev.properties
+│           ├── application-docker.properties
+│           └── application-prod.properties
+├── Frontend/
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── src/
+│       ├── Components/
+│       ├── pages/
+│       ├── context/
+│       ├── services/
+│       ├── Router/
+│       ├── modules/
+│       ├── hooks/
+│       └── utils/
+├── docker-compose.yml
+├── README.md
+├── PROJECT_DESCRIPTION.md
+└── LICENSE.txt
+```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
-- **Node.js** (v16 or higher)
-- **Java JDK** (11 or higher)
-- **Maven** (3.6 or higher)
-- **PostgreSQL** or **MySQL** database
+- **Docker Desktop** (for the Quick Start path)
+- **Node.js** (v18+) and **Java JDK 21** + **Maven** (for manual/non-Docker setup)
+- **PostgreSQL** (only needed for manual/non-Docker setup)
 - **Git**
 
-### Frontend Setup
+### Quick Start (Docker Compose)
 
 1. **Clone the repository**
    ```bash
@@ -136,75 +151,64 @@ This ERP system provides a comprehensive solution for managing enterprise operat
    cd Enterprise-Resource-Planning-Spring-Boot-Application
    ```
 
-2. **Switch to frontend branch**
+2. **Set your own environment values**
+
+   Before starting, set your own values for the database credentials, JWT signing secret, mail credentials, and the initial admin account — either in a `.env` file referenced by `docker-compose.yml` or as exported environment variables. Don't rely on any built-in fallback values beyond a throwaway local test.
+
+3. **Start the stack**
    ```bash
-   git checkout frontend
+   docker-compose up -d --build
    ```
+   This brings up PostgreSQL, the Spring Boot backend, and the Nginx-served frontend together. Check `docker-compose.yml` for the exposed frontend port on your machine.
 
-3. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### Manual Setup (without Docker)
 
-4. **Configure environment variables**
-   
-   Create a `.env` file in the root directory:
-   ```env
-   VITE_BACKEND_URL=https://localhost:8443/api
-   VITE_API_URL=https://localhost:8443/api
-   VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
-   ```
+**Frontend**
+```bash
+cd Frontend
+npm install
+```
+Create a `.env` file:
+```env
+VITE_BACKEND_URL=https://localhost:8443/api
+VITE_API_URL=https://localhost:8443/api
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
+```
+Generate local SSL certificates (one-time setup, for HTTPS in local dev):
+```bash
+# Install mkcert
+choco install mkcert  # Windows
+brew install mkcert   # macOS
 
-5. **Generate SSL certificates for local development**
-   ```bash
-   # Install mkcert (one-time setup)
-   choco install mkcert  # Windows
-   brew install mkcert   # macOS
-   
-   # Generate certificates
-   mkcert -install
-   mkdir cert
-   cd cert
-   mkcert localhost 127.0.0.1 ::1
-   ```
+mkcert -install
+mkdir cert && cd cert
+mkcert localhost 127.0.0.1 ::1
+```
+Then:
+```bash
+npm run dev
+```
+Access at `https://localhost:3000`.
 
-6. **Start development server**
-   ```bash
-   npm run dev
-   ```
-   Access at: `https://localhost:3000`
+**Backend**
 
-### Backend Setup
+Edit `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/erp_db
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+server.port=8443
+```
+Then:
+```bash
+mvn clean install
+mvn spring-boot:run
+```
+API available at `https://localhost:8443/api`.
 
-1. **Switch to backend branch**
-   ```bash
-   git checkout backend
-   ```
+## API Documentation
 
-2. **Configure application properties**
-   
-   Edit `src/main/resources/application.properties`:
-   ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/erp_db
-   spring.datasource.username=your_username
-   spring.datasource.password=your_password
-   server.port=8443
-   ```
-
-3. **Build the application**
-   ```bash
-   mvn clean install
-   ```
-
-4. **Run the application**
-   ```bash
-   mvn spring-boot:run
-   ```
-   API available at: `https://localhost:8443/api`
-
-## 📚 API Documentation
-
-### Authentication Endpoints
+### Authentication
 - `POST /api/auth/login` - User login
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/forgot-password` - Request password reset
@@ -235,67 +239,66 @@ This ERP system provides a comprehensive solution for managing enterprise operat
 - `PUT /api/calendar/events/{id}` - Update event
 - `DELETE /api/calendar/events/{id}` - Delete event
 
-## 🔐 Security Features
+## Security Features
 
-- **Authentication**: JWT-based authentication with refresh tokens
-- **Authorization**: Role-based access control (RBAC)
-- **Encryption**: HTTPS/SSL for all communications
-- **reCAPTCHA**: Bot protection on login and registration
-- **Password Security**: Bcrypt hashing for passwords
-- **CORS**: Configured for secure cross-origin requests
-- **Session Management**: Secure session handling
-- **Input Validation**: Server-side validation for all inputs
+- **Authentication**: JWT-based, stateless session handling
+- **Roles**: `USER` and `ADMIN`, with administrator approval required before a new account is activated
+- **Password Security**: Bcrypt hashing
+- **Transport**: HTTPS/SSL supported for local development via mkcert; configure TLS termination explicitly for any shared or production deployment
+- **CORS**: Configurable cross-origin policy
+- **Input Validation**: Bean Validation on core request DTOs (authentication, several sales endpoints)
 
-## 🎨 User Interface
+Refresh-token rotation, consistent role-based authorization across every module, and enforced server-side reCAPTCHA validation are not yet in place — see Known Limitations.
 
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Dark/Light Mode**: User preference support (coming soon)
-- **Intuitive Navigation**: Easy-to-use interface
-- **Real-time Updates**: Live data refresh via WebSocket
-- **Loading States**: Clear feedback for all operations
-- **Error Handling**: User-friendly error messages
-- **Toast Notifications**: Success and error notifications
+## User Interface
 
-## 📊 Database Schema
+- Responsive design across desktop, tablet, and mobile
+- Dark/Light mode (planned)
+- Real-time updates via WebSocket
+- Loading states, toast notifications, and user-friendly error handling
 
-The application uses a relational database with the following main entities:
+## Database Schema
 
-- **Users**: User accounts and authentication
-- **Roles**: User roles and permissions
-- **Tasks**: Task management and assignments
-- **Events**: Calendar events and schedules
-- **Messages**: Chat messages and conversations
-- **Employees**: Employee information
-- **Sales Orders**: Sales transactions
-- **Invoices**: Invoice records
-- **Products**: Product catalog
-- **Security Logs**: Security and audit logs
+Main entities:
 
-## 🧪 Testing
+- **Users**: accounts and authentication
+- **Tasks / Events**: calendar and task scheduling
+- **Messages**: chat messages and conversations
+- **Employees**: HR employee records
+- **Clients, Products, Quotes, Orders, Invoices**: sales pipeline
+- **Security Logs**: activity and security-scan log entries
 
+## Deployment
+
+### Docker Compose (recommended)
+The repository includes `Dockerfile`s for both the frontend and backend plus a root `docker-compose.yml` that runs PostgreSQL, the backend, and an Nginx-served frontend together. This is the primary supported deployment path — see Quick Start above.
+
+### Frontend only (Vercel/Netlify)
 ```bash
-# Frontend tests
-npm run test
-
-# Backend tests
-mvn test
-```
-
-## 📦 Deployment
-
-### Frontend (Vercel/Netlify)
-```bash
+cd Frontend
 npm run build
-# Deploy dist/ folder
+# Deploy the dist/ folder
 ```
 
-### Backend (Heroku/AWS/Azure)
+### Backend only (Heroku/AWS/Azure)
 ```bash
+cd Backend
 mvn clean package
 # Deploy target/*.jar
 ```
 
-## 🤝 Contributing
+## Known Limitations
+
+- Authorization is currently strongest around authentication and admin-only routes; consistent role-based checks across the HR and sales modules are still being built out.
+- No refresh-token flow yet — sessions rely on a single JWT until it expires.
+- reCAPTCHA has a frontend widget in place, but server-side verification isn't wired up yet.
+- No automated test suite (backend or frontend) yet.
+- No versioned database migrations yet — schema changes currently rely on Hibernate's auto-update.
+- The security dashboard currently displays sample data in several panels while backend integration is completed.
+- Database driver support is PostgreSQL only (not MySQL, despite older docs implying otherwise).
+- Inventory, general-ledger accounting, and payroll are out of scope for the current sales/HR modules.
+
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
@@ -303,34 +306,25 @@ mvn clean package
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-**Important**: Never commit sensitive information (API keys, passwords, certificates)
+**Important**: Never commit sensitive information (API keys, passwords, certificates).
 
-## 📝 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.txt) file for details.
 
-## 👨‍💻 Author
+## Author
 
 **Yasser Namez**
 - GitHub: [@yassernamez03](https://github.com/yassernamez03)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built for Union Concept
 - Spring Boot and React communities
 - Open source contributors
 
-## 📞 Support
+## Support
 
 For support and questions:
 - Create an issue on GitHub
 - Contact the development team
-
----
-
-**Note**: This is a modular ERP system. Different branches contain different parts of the application:
-- `main` - Documentation and project overview
-- `frontend` - React application
-- `backend` - Spring Boot API server
-
-Make sure to check out the appropriate branch for the code you need.
